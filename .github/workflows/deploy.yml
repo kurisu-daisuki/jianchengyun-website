@@ -1,43 +1,64 @@
-name: deploy to aliyun oss
+name: Deploy to Aliyun OSS
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
 
 jobs:
-  build:
-
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-    # 切代码到 runner
-    - uses: actions/checkout@v1
-      with:
-        submodules: true
-    # Add this step before using git-actions
-    - name: Configure git safe directory
-      run: git config --global --add safe.directory /github/workspace
-    # 下载 git submodule
-    - uses: srt32/git-actions@v0.0.3
-      with:
-        args: git submodule update --init --recursive
-    # 使用 node:10
-    - name: use Node.js 10.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 10.x
-    # npm install
-    - name: npm install and build
-      run: |
-        npm install
-        npm run build
-      env:
-        CI: true
-    # 设置阿里云OSS的 id/secret，存储到 github 的 secrets 中
-    - name: setup aliyun oss
-      uses: manyuanrong/setup-ossutil@master
-      with:
-        endpoint: oss-cn-beijing.aliyuncs.com
-        access-key-id: ${{ secrets.OSS_KEY_ID }}
-        access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
-    - name: cp files to aliyun
-      run: ossutil cp -rf .vuepress/dist oss://shanyue-blog/
-      #test
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Configure git safe directory
+        # 如果在 runner 上遇到 "dubious ownership" 错误，保留此行；若无此类错误可以删除
+        run: git config --global --add safe.directory '*'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          # 修改为你希望的 Node 版本（例如 16 或 18）
+          node-version: '16'
+
+      - name: Install dependencies and build
+        run: |
+          npm ci
+          npm run build
+        env:
+          CI: true
+
+      - name: Setup aliyun ossutil
+        # 使用提供的 action 安装 ossutil。你可以替换为其他方式安装 ossutil（例如手动下载安装）。
+        uses: manyuanrong/setup-ossutil@master
+        with:
+          # 修改为你的阿里云 OSS 外网 endpoint（不要使用 internal endpoint），例如：oss-cn-beijing.aliyuncs.com
+          endpoint: oss-cn-guangzhou.aliyuncs.com
+          # 如果你在仓库 Secrets 中使用了不同的名字，这里也要相应修改
+          access-key-id: ${{ secrets.OSS_KEY_ID }}
+          access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
+
+      - name: Deploy built files to OSS
+        env:
+          # 可选：设置环境变量以便 ossutil 使用（多数情况无需修改）
+          OSSUTIL_ENDPOINT: oss-cn-guangzhou.aliyuncs.com
+        run: |
+          # 修改下面两项：
+          # 1) 本地构建产物路径（当前假定为 .vuepress/dist，若不同请修改）
+          # 2) 目标桶地址（oss://your-bucket-name/），替换 shanyue-blog
+          LOCAL_BUILD_PATH=".vuepress/dist" # <-- 如需修改请替换为你的构建输出路径
+          TARGET_BUCKET="oss://hnncyun-web/" # <-- 将 shanyue-blog 替换为你的 bucket 名称
+
+          if [ ! -d "$LOCAL_BUILD_PATH" ]; then
+            echo "构建产物不存在: $LOCAL_BUILD_PATH"
+            exit 1
+          fi
+
+          # 将构建产物同步到 OSS。根据需要可以修改 ossutil 参数（例如 --update、--delete 等）。
+          ossutil cp -r "$LOCAL_BUILD_PATH" "$TARGET_BUCKET" --update
+
+          echo "部署完成 -> $TARGET_BUCKET"
