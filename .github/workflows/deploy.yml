@@ -12,6 +12,9 @@ jobs:
     - uses: actions/checkout@v1
       with:
         submodules: true
+    # Add this step before using git-actions
+    - name: Configure git safe directory
+      run: git config --global --add safe.directory '*'
     # 下载 git submodule
     - uses: srt32/git-actions@v0.0.3
       with:
