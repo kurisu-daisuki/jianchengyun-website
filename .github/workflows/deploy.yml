@@ -29,6 +29,9 @@ jobs:
         run: |
           npm install
           npm run build
+           echo "=== Build Output ==="
+           ls -la
+           find . -type d -name "dist" -o -name "build" -o -name "out" 2>/dev/null
         env:
           CI: true
 
