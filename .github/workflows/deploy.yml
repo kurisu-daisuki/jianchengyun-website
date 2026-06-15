@@ -53,7 +53,7 @@ jobs:
           # 修改下面两项：
           # 1) 本地构建产物路径（当前假定为 .vuepress/dist，若不同请修改）
           # 2) 目标桶地址（oss://your-bucket-name/），替换 shanyue-blog
-          LOCAL_BUILD_PATH=".vuepress/dist" # <-- 如需修改请替换为你的构建输出路径
+          LOCAL_BUILD_PATH="dist" # <-- 如需修改请替换为你的构建输出路径
           TARGET_BUCKET="oss://hnncyun-web/" # <-- 将 shanyue-blog 替换为你的 bucket 名称
 
           if [ ! -d "$LOCAL_BUILD_PATH" ]; then
