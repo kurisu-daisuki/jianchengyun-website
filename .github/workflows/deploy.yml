@@ -37,3 +37,4 @@ jobs:
         access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
     - name: cp files to aliyun
       run: ossutil cp -rf .vuepress/dist oss://shanyue-blog/
+      #test
