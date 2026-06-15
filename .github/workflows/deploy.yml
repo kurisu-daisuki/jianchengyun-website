@@ -15,6 +15,10 @@ jobs:
     # Add this step before using git-actions
     - name: Configure git safe directory
       run: git config --global --add safe.directory /github/workspace
+      run: git config --global --add safe.directory '*'
+=========
+      run: git config --global --add safe.directory/github/workspace
+>>>>>>>>> Temporary merge branch 2
     # 下载 git submodule
     - uses: srt32/git-actions@v0.0.3
       with:
