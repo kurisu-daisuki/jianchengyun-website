@@ -23,6 +23,9 @@ echo ""
 echo "📦 [1/3] 构建前端静态文件..."
 NODE_ENV=production npx rspack build --config rspack.config.js --env mode=production
 echo "   ✅ 构建完成 → $DIST_DIR"
+
+# 修复 HTML 模板变量
+node scripts/fix-html-oss.js
 echo ""
 
 # 步骤 2: 列出产物

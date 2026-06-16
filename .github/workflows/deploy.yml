@@ -24,13 +24,15 @@ jobs:
           CI: true
 
       - name: Build static site
-        run: npm run build:oss
+        run: |
+          npm run build:oss
+          node scripts/fix-html-oss.js
         env:
           NODE_ENV: production
           CI: true
 
       - name: Setup aliyun ossutil
-        uses: manyuanrong/setup-ossutil@v3
+        uses: manyuanrong/setup-ossutil@master
         with:
           endpoint: ${{ secrets.OSS_ENDPOINT }}
           access-key-id: ${{ secrets.OSS_KEY_ID }}

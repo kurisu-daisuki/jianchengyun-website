@@ -22,6 +22,10 @@ Write-Host "📦 [1/3] 构建前端静态文件..." -ForegroundColor Yellow
 Push-Location $RootDir
 $env:NODE_ENV = "production"
 npx rspack build --config rspack.config.js --env mode=production
+
+# 修复 HTML 模板变量
+node scripts/fix-html-oss.js
+
 Pop-Location
 Write-Host "   ✅ 构建完成 → $DistDir" -ForegroundColor Green
 Write-Host ""
