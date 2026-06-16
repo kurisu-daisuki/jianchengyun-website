@@ -10,58 +10,52 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-          fetch-depth: 0
-
-      - name: Configure git safe directory
-        # 如果在 runner 上遇到 "dubious ownership" 错误，保留此行；若无此类错误可以删除
-        run: git config --global --add safe.directory '*'
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          # 修改为你希望的 Node 版本（例如 16 或 18）
           node-version: '22'
+          cache: 'npm'
 
-      - name: Install dependencies and build
-        run: |
-          npm install
-          npm run build
-           echo "=== Build Output ==="
-           ls -la
-           find . -type d -name "dist" -o -name "build" -o -name "out" 2>/dev/null
+      - name: Install dependencies
+        run: npm ci
         env:
           CI: true
 
+      - name: Build static site
+        run: npm run build:oss
+        env:
+          NODE_ENV: production
+          CI: true
+
       - name: Setup aliyun ossutil
-        # 使用提供的 action 安装 ossutil。你可以替换为其他方式安装 ossutil（例如手动下载安装）。
-        uses: manyuanrong/setup-ossutil@master
+        uses: manyuanrong/setup-ossutil@v3
         with:
-          # 修改为你的阿里云 OSS 外网 endpoint（不要使用 internal endpoint），例如：oss-cn-beijing.aliyuncs.com
-          endpoint: oss-cn-guangzhou.aliyuncs.com
-          # 如果你在仓库 Secrets 中使用了不同的名字，这里也要相应修改
+          endpoint: ${{ secrets.OSS_ENDPOINT }}
           access-key-id: ${{ secrets.OSS_KEY_ID }}
           access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
 
-      - name: Deploy built files to OSS
-        env:
-          # 可选：设置环境变量以便 ossutil 使用（多数情况无需修改）
-          OSSUTIL_ENDPOINT: oss-cn-guangzhou.aliyuncs.com
+      - name: Deploy to OSS
         run: |
-          # 修改下面两项：
-          # 1) 本地构建产物路径（当前假定为 .vuepress/dist，若不同请修改）
-          # 2) 目标桶地址（oss://your-bucket-name/），替换 shanyue-blog
-          LOCAL_BUILD_PATH="dist" # <-- 如需修改请替换为你的构建输出路径
-          TARGET_BUCKET="oss://hnncyun-web/" # <-- 将 shanyue-blog 替换为你的 bucket 名称
+          LOCAL_BUILD_PATH="dist/client"
+          TARGET_BUCKET="${{ secrets.OSS_BUCKET }}"
 
           if [ ! -d "$LOCAL_BUILD_PATH" ]; then
-            echo "构建产物不存在: $LOCAL_BUILD_PATH"
+            echo "❌ 构建产物不存在: $LOCAL_BUILD_PATH"
             exit 1
           fi
 
-          # 将构建产物同步到 OSS。根据需要可以修改 ossutil 参数（例如 --update、--delete 等）。
-          ossutil cp -r "$LOCAL_BUILD_PATH" "$TARGET_BUCKET" --update
+          echo "📦 上传 JS/CSS/图片（长期缓存）..."
+          ossutil cp -r "$LOCAL_BUILD_PATH/" "$TARGET_BUCKET" \
+            --update \
+            --meta "Cache-Control:public,max-age=31536000,immutable" \
+            --include "*.js" --include "*.css" --include "*.svg" --include "*.png" --include "*.jpg" --include "*.webp" --include "*.ico"
 
-          echo "部署完成 -> $TARGET_BUCKET"
+          echo "📄 上传 HTML（不缓存）..."
+          ossutil cp -r "$LOCAL_BUILD_PATH/" "$TARGET_BUCKET" \
+            --update \
+            --meta "Cache-Control:no-cache" \
+            --include "*.html"
+
+          echo "✅ 部署完成 → $TARGET_BUCKET"

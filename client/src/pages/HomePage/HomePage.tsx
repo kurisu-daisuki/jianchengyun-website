@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Box, Activity, Layers, Phone, Mail, MapPin, ChevronUp, Menu, X, Loader2 } from 'lucide-react';
-import { getAllContent } from '@/api';
-import type { AllContentResponse } from '@shared/api.interface';
+import { Box, Activity, Layers, Phone, Mail, MapPin, ChevronUp, Menu, X } from 'lucide-react';
+import { staticProducts, staticTimeline } from '@/data/static-content';
 
 const logoUrl = 'https://miaoda.feishu.cn/aily/api/v1/feisuda/attachments/e8d9053e-7f6f-4432-a2fe-37e9cfe60da0/raw';
 
@@ -12,15 +11,6 @@ const iconMap: Record<string, React.ElementType> = { Box, Activity, Layers };
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [content, setContent] = useState<AllContentResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getAllContent()
-      .then(data => setContent(data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 100);
@@ -139,16 +129,8 @@ export default function HomePage() {
     },
   ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin" />
-      </div>
-    );
-  }
-
-  const products = content?.products || [];
-  const timeline = content?.timeline || [];
+  const products = staticProducts;
+  const timeline = staticTimeline;
 
   const allClients = [
     ...clientCases.UKP3D,
