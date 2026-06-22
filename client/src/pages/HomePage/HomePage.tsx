@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Box, Activity, Layers, Phone, Mail, MapPin, ChevronUp, Menu, X } from 'lucide-react';
+import { Box, Activity, Layers, Building, Phone, Mail, MapPin, ChevronUp, Menu, X } from 'lucide-react';
 import { staticProducts, staticTimeline } from '@/data/static-content';
 
 const logoUrl = 'https://miaoda.feishu.cn/aily/api/v1/feisuda/attachments/e8d9053e-7f6f-4432-a2fe-37e9cfe60da0/raw';
 
-const iconMap: Record<string, React.ElementType> = { Box, Activity, Layers };
+const iconMap: Record<string, React.ElementType> = { Box, Activity, Layers,Building };
 
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

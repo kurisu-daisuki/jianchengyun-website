@@ -41,6 +41,18 @@ export const staticProducts: Product[] = [
     iconName: 'Layers',
     displayOrder: 3,
   },
+  {
+    id: '4',
+    productKey: 'HLDS',
+    name: 'HLDS',
+    subtitle: '土建荷载提资设计协同系统',
+    description: '多专业协同设计平台，实现载荷数据的高效提资与共享，提升团队协作效率。',
+    features: ['荷载提资', '多专业协同', '数据共享', '流程管理'],
+    imageUrl: '',
+    tags: ['协同设计', '荷载提资'],
+    iconName: 'Building',
+    displayOrder: 4,
+  }
 ];
 
 export const staticTimeline: Timeline[] = [
