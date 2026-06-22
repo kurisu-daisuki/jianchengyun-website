@@ -46,7 +46,7 @@ export const staticProducts: Product[] = [
 export const staticTimeline: Timeline[] = [
   {
     id: 't1',
-    year: '2014',
+    year: '2011',
     title: '公司成立',
     description: '湖南建诚云信息技术有限公司在长沙成立，致力于工业设计软件领域。',
     displayOrder: 1,
