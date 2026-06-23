@@ -58,7 +58,7 @@ jobs:
           curl -L https://gosspublic.alicdn.com/ossutil/1.7.19/ossutil-v1.7.19-linux-amd64.zip -o /tmp/ossutil.zip
           sudo unzip -o /tmp/ossutil.zip -d /usr/local/bin/
           sudo chmod +x /usr/local/bin/ossutil
-          ossutil config -e ${{ secrets.OSS_ENDPOINT }} -i ${{ secrets.OSS_ACCESS_KEY_ID }} -k ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+          ossutil config -e ${{ secrets.OSS_ENDPOINT }} -i ${{ secrets.OSS_KEY_ID }} -k ${{ secrets.OSS_KEY_SECRET }}
 
       # ==========================================
       # 6. 部署到 OSS
@@ -66,8 +66,8 @@ jobs:
       - name: 🚀 部署到 OSS
         run: bash ./scripts/deploy-oss.sh
         env:
-          OSS_BUCKET: ${{ secrets.OSS_BUCKET || 'jianchengyun' }}
-          OSS_REGION: ${{ secrets.OSS_REGION || 'oss-cn-shenzhen' }}
+          OSS_BUCKET: ${{ secrets.OSS_BUCKET || 'hnjcyun-web' }}
+          OSS_REGION: ${{ secrets.OSS_REGION || 'oss-cn-guangzhou' }}
 
       # ==========================================
       # 7. 刷新 CDN 缓存（可选，如果配置了 CDN）
