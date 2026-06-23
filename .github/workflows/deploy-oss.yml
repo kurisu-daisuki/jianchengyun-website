@@ -56,7 +56,8 @@ jobs:
       - name: ⚙️ 配置 ossutil
         run: |
           curl -L https://gosspublic.alicdn.com/ossutil/1.7.19/ossutil-v1.7.19-linux-amd64.zip -o /tmp/ossutil.zip
-          sudo unzip -o /tmp/ossutil.zip -d /usr/local/bin/
+          sudo unzip -o /tmp/ossutil.zip -d /tmp/ossutil-bin/
+          sudo cp /tmp/ossutil-bin/ossutil-v1.7.19-linux-amd64/ossutil64 /usr/local/bin/ossutil
           sudo chmod +x /usr/local/bin/ossutil
           ossutil config -e ${{ secrets.OSS_ENDPOINT }} -i ${{ secrets.OSS_KEY_ID }} -k ${{ secrets.OSS_KEY_SECRET }}
 
